@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"medium-go-redis/src/business/entity"
 	"medium-go-redis/src/lib/redis"
 	"time"
@@ -33,6 +34,13 @@ func (p *product) GetList(ctx context.Context) ([]entity.Product, error) {
 
 	// get cache
 	cachedProducts, err := p.redis.Get(ctx, entity.ProductListRedisKey)
+	switch {
+	case errors.Is(err, redis.Nil):
+		p.db.Logger.Info(ctx, err.Error())
+	case err != nil:
+		p.db.Logger.Error(ctx, err.Error())
+	}
+
 	if err == nil {
 		if err := json.Unmarshal([]byte(cachedProducts), &res); err != nil {
 			return res, err
