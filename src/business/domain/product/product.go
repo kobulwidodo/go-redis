@@ -45,6 +45,7 @@ func (p *product) GetList(ctx context.Context) ([]entity.Product, error) {
 		if err := json.Unmarshal([]byte(cachedProducts), &res); err != nil {
 			return res, err
 		}
+		p.db.Logger.Info(ctx, "successfuly get data from redis")
 		return res, nil
 	}
 
